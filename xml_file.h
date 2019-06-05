@@ -7,15 +7,21 @@
 #include <boost/foreach.hpp>
 #include <boost/optional/optional.hpp>
 
+#include <sys/stat.h>
+#include <iostream>
+
+
 class xml_file{
 private:
     boost::property_tree::ptree pt_;
     std::string xml_path_;
 
+    std::string checkPath(std::string);
+
 public:
     xml_file();
-    ~xml_file();
     xml_file(std::string xml_path);
+    ~xml_file();
     boost::property_tree::ptree readFile(std::string xml_path);
     void writeFile(std::string xml_path, boost::property_tree::ptree pt);
 

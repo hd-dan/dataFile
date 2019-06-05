@@ -14,10 +14,7 @@ data_file::~data_file(){
 bool data_file::openFile(){
     if (path_.at(0)=='~'){
         path_.erase(0,1);
-        std::string prefix("/home/");
-        prefix+=getenv("LOGNAME");
-        prefix+=path_;
-        path_= prefix;
+        path_= std::string("/home/") + getenv("LOGNAME") + path_;
     }
 
     std::string dir= path_.substr(0,path_.find_last_of('/'));

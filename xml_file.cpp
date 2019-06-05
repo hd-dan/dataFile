@@ -1,16 +1,29 @@
 #include "xml_file.h"
-#include <iostream>
 
 xml_file::xml_file(){
 
 }
 
+xml_file::xml_file(std::string xml_path){
+    xml_path_= xml_file::checkPath(xml_path);
+    pt_= xml_file::readFile(xml_path_);
+}
+
 xml_file::~xml_file(){
 }
 
-xml_file::xml_file(std::string xml_path){
-    xml_path_= xml_path;
-    pt_= xml_file::readFile(xml_path_);
+std::string xml_file::checkPath(std::string path){
+    if (path.at(0)=='~'){
+        path.erase(0,1);
+        path= std::string("/home/") + getenv("LOGNAME") + path;
+    }
+
+    std::string dir= path.substr(0,path.find_last_of('/'));
+    struct stat st;
+    if (stat(dir.c_str(),&st)!=0){
+        mkdir(dir.c_str(),S_IRWXU);
+    }
+    return path;
 }
 
 boost::property_tree::ptree xml_file::readFile(std::string xml_path){
