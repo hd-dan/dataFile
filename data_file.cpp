@@ -1,9 +1,21 @@
 #include "data_file.h"
 
 
-data_file::data_file(std::string data_path){
-    path_= data_path;
-    open_= false;
+data_file::data_file(std::string data_path):
+                            path_(data_path), open_(false){
+    data_file::openFile();
+}
+
+data_file::data_file(std::string data_path, std::string num_path):
+                            path_(data_path),open_(false){
+    int i= getFileNum(num_path);
+    for (int j=0;j<2;j++){
+        std::size_t pos= path_.find('%');
+        if (pos!=std::string::npos){
+            path_.erase(pos,1);
+            path_.insert(pos,std::to_string(i));
+        }
+    }
     data_file::openFile();
 }
 
@@ -11,11 +23,33 @@ data_file::~data_file(){
     data_file::closeFile();
 }
 
-bool data_file::openFile(){
-    if (path_.at(0)=='~'){
-        path_.erase(0,1);
-        path_= std::string("/home/") + getenv("LOGNAME") + path_;
+int data_file::getFileNum(std::string num_path){
+    if (num_path.at(0)=='~')
+        num_path= getenv("HOME")+num_path.substr(1,num_path.size()-1);
+    std::string dir= num_path.substr(0,num_path.find_last_of('/'));
+    struct stat st;
+    if (stat(dir.c_str(),&st)!=0)
+        mkdir(dir.c_str(),S_IRWXU);
+
+    std::fstream file;
+    int i=0;
+
+    file.open(num_path,std::ios::in);
+    if (file.is_open()){
+        std::string line;
+        std::getline(file,line);
+        i= std::stoi(line);
+        file.close();
     }
+    file.open(num_path, std::ios::out|std::ios::trunc);
+    file<<i+1;
+    file.close();
+    return i;
+}
+
+bool data_file::openFile(){
+    if (path_.at(0)=='~')
+        path_= getenv("HOME")+path_.substr(1,path_.size()-1);
 
     std::string dir= path_.substr(0,path_.find_last_of('/'));
     struct stat st;

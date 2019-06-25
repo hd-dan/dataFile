@@ -5,8 +5,8 @@
 
 void testDataFile(){
 
-    std::string path("~/Desktop/testData.txt");
-    data_file datafile(path);
+    std::string path("~/Desktop/test%/testData%.txt");
+    data_file datafile(path,"~/Desktop/num/testnum");
 
     std::vector<double> v(3,-1);
     std::vector<double> x(2,10);

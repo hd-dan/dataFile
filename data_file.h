@@ -20,9 +20,11 @@ private:
     bool open_;
 
     std::vector<boost::any> recordBuffer_;
+    int getFileNum(std::string num_path);
 
 public:
     data_file(std::string data_path);
+    data_file(std::string data_path, std::string num_path);
     ~data_file();
     bool openFile();
 
