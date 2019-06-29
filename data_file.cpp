@@ -58,7 +58,10 @@ bool data_file::openFile(){
     }
 
     if(!file_.is_open()){
-       file_.open(path_.c_str());
+       file_.open(path_.c_str(), std::ios::out|std::ios::trunc);
+       file_.flush();
+       file_.close();
+       file_.open(path_.c_str(), std::ios::in|std::ios::out);
     }
     open_=file_.is_open();
     return open_;
@@ -67,6 +70,7 @@ bool data_file::openFile(){
 
 bool data_file::closeFile(){
     if (open_){
+       file_.rmExtraDelimilter();
        file_.close();
        open_=file_.is_open();
     }
@@ -128,6 +132,17 @@ bool data_file::endLine(){
     return true;
 }
 
+bool data_file::rmExtraDelimiter(){
+    file_.seekg(-1,file_.end);
+    char c= file_.get();
+    if (c==','){
+        file_.seekg(-1,file_.end);
+        file_<< ' ';
+        return true;
+    }
+    return false;
+}
+
 void data_file::recordTarget(std::string name, double &data){
     data_file::header(name);
     data_file::recordTarget(data);
@@ -147,7 +162,8 @@ void data_file::recordTarget(std::vector<double> &data){
 }
 
 void data_file::record(){
-
+    
+    data_file::rmExtraDelimiter();
     data_file::endLine();
     for (unsigned int i=0;i<recordBuffer_.size();i++){
         if (recordBuffer_.at(i).type()==typeid(double *)){
