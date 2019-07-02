@@ -48,6 +48,7 @@ int data_file::getFileNum(std::string num_path){
 }
 
 bool data_file::openFile(){
+    delimiter_= ',';
     if (path_.at(0)=='~')
         path_= getenv("HOME")+path_.substr(1,path_.size()-1);
 
@@ -70,7 +71,7 @@ bool data_file::openFile(){
 
 bool data_file::closeFile(){
     if (open_){
-       file_.rmExtraDelimilter();
+       data_file::rmExtraDelimiter();
        file_.close();
        open_=file_.is_open();
     }
@@ -81,7 +82,7 @@ bool data_file::closeFile(){
 bool data_file::header(std::string name){
     if (!open_) return false;
 
-    file_<<name.c_str()<<"\t";
+    file_<<name.c_str()<< delimiter_<<"\t";
     return true;
 }
 
@@ -90,7 +91,7 @@ bool data_file::header(std::string name, std::vector<num> x){
     if (!open_) return false;
 
     for (unsigned long i=0; i<x.size();i++){
-       file_ << name <<"["<<i<<"]" << "\t";
+       file_ << name <<"["<<i<<"]" << delimiter_<<"\t";
     }
     return true;
 }
@@ -104,7 +105,7 @@ bool data_file::write(std::vector<num> x){
     if (!open_) return false;
 
     for (unsigned long i=0;i<x.size();i++){
-       file_<< x.at(i) <<"\t";
+        file_<< x.at(i) << delimiter_<<"\t";
     }
     return true;
 }
@@ -118,7 +119,7 @@ template <class num>
 bool data_file::write(num x){
     if (!open_) return false;
 
-   file_ << x <<"\t";
+    file_ <<x << delimiter_<<"\t";
     return true;
 }
 template bool data_file::write<double>(double);
@@ -133,10 +134,10 @@ bool data_file::endLine(){
 }
 
 bool data_file::rmExtraDelimiter(){
-    file_.seekg(-1,file_.end);
+    file_.seekg(-2,file_.end);
     char c= file_.get();
-    if (c==','){
-        file_.seekg(-1,file_.end);
+    if (c==delimiter_){
+        file_.seekg(-2,file_.end);
         file_<< ' ';
         return true;
     }

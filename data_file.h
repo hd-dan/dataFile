@@ -22,6 +22,7 @@ private:
     std::vector<boost::any> recordBuffer_;
     int getFileNum(std::string num_path);
     
+    char delimiter_;
     bool rmExtraDelimiter();
 
 public:
