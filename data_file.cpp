@@ -1,9 +1,14 @@
 #include "data_file.h"
 
 
-data_file::data_file(std::string data_path):
+data_file::data_file(std::string data_path, bool write):
                             path_(data_path), open_(false){
-    data_file::openFile();
+    if (path_.at(0)=='~')
+        path_= getenv("HOME")+path_.substr(1,path_.size()-1);
+    if (write)
+        data_file::openFile();
+    else
+        data_file::readFile();
 }
 
 data_file::data_file(std::string data_path, std::string num_path):
@@ -178,4 +183,45 @@ void data_file::record(){
 
         }
     }
+}
+
+std::vector<std::vector<double> > data_file::readFile(){
+    file_.close();
+    file_.open(path_,std::ios::in);
+    file_.seekg(0,file_.beg);
+
+    std::string line;
+    std::getline(file_,line);
+
+    while( std::getline(file_,line) ){
+        std::vector<double> lineVect= data_file::processLine(line);
+        if (contentBuf_.size()==0){
+            contentBuf_= std::vector<std::vector<double> >
+                    (lineVect.size(),std::vector<double>(0,0));
+        }
+        for (unsigned int i=0;i<lineVect.size();i++){
+            contentBuf_.at(i).push_back(lineVect.at(i));
+        }
+    }
+
+    return contentBuf_;
+}
+
+std::vector<double> data_file::processLine(std::string line){
+    size_t pos=0;
+    std::vector<double> dataVect;
+    while( (pos= line.find(',')) != std::string::npos){
+        std::string parseStr= line.substr(0,pos);
+        double parseVal= std::stod(parseStr);
+        dataVect.push_back(parseVal);
+        line.erase(0,pos+1);
+    }
+    double parseVal= std::stod(line);
+    dataVect.push_back(parseVal);
+
+    return dataVect;
+}
+
+std::vector<std::vector<double> > data_file::getContent(){
+    return contentBuf_;
 }

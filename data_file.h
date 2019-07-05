@@ -25,8 +25,11 @@ private:
     char delimiter_;
     bool rmExtraDelimiter();
 
+    std::vector<std::vector<double> > contentBuf_;
+    std::vector<double> processLine(std::string line);
+
 public:
-    data_file(std::string data_path);
+    data_file(std::string data_path, bool write=1);
     data_file(std::string data_path, std::string num_path);
     ~data_file();
     bool openFile();
@@ -50,6 +53,8 @@ public:
     void recordTarget(std::vector<double> &data);
     void record();
 
+    std::vector<std::vector<double> > readFile();
+    std::vector<std::vector<double> > getContent();
 };
 
 #endif // DATA_FILE_H

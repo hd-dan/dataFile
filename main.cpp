@@ -40,10 +40,44 @@ void testDataFile(){
 
 }
 
+void testParse(){
+    std::string str= " 123, 13, 22.1, 43, 1.53 ";
+    printf("Input: %s\n",str.c_str());
+    size_t pos=0;
+    std::vector<double> vect;
+    while( (pos= str.find(',')) != std::string::npos){
+        std::string parseStr= str.substr(0,pos);
+        double parseVal= std::stod(parseStr);
+        vect.push_back(parseVal);
+        str.erase(0,pos+1);
+    }
+    double parseVal= std::stod(str);
+    vect.push_back(parseVal);
+
+    for(unsigned int i=0;i<vect.size();i++){
+        printf(" %.3f |",vect.at(i));
+    }
+
+}
+
+void readFile(){
+    data_file file("~/Desktop/testData.csv",0);
+    std::vector<std::vector<double> > content= file.getContent();
+
+    for(unsigned i=0;i<content.size();i++){
+        for(unsigned j=0;j<content.at(i).size();j++){
+            printf("%.3f, ",content.at(i).at(j));
+        }
+        printf("\n");
+    }
+}
+
 int main(){
     std::cout << "Hello World!" << std::endl;
 
-    testDataFile();
+//    testDataFile();
+//    testParse();
+    readFile();
 
     return 0;
 }
