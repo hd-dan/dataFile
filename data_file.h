@@ -26,11 +26,13 @@ private:
     bool rmExtraDelimiter();
 
     std::vector<std::vector<double> > contentBuf_;
+    std::vector<std::string> contentHeader_;
     std::vector<double> processLine(std::string line);
+    std::vector<std::string> processHeaders(std::string line);
 
 public:
     data_file(std::string data_path, bool write=1);
-    data_file(std::string data_path, std::string num_path);
+    data_file(std::string data_path, std::string num_path, bool write=1);
     ~data_file();
     bool openFile();
 
@@ -55,6 +57,7 @@ public:
 
     std::vector<std::vector<double> > readFile();
     std::vector<std::vector<double> > getContent();
+    std::vector<std::string> getHeader();
 };
 
 #endif // DATA_FILE_H

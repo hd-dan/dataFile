@@ -11,7 +11,7 @@ data_file::data_file(std::string data_path, bool write):
         data_file::readFile();
 }
 
-data_file::data_file(std::string data_path, std::string num_path):
+data_file::data_file(std::string data_path, std::string num_path, bool write):
                             path_(data_path),open_(false){
     int i= getFileNum(num_path);
     for (int j=0;j<2;j++){
@@ -192,6 +192,7 @@ std::vector<std::vector<double> > data_file::readFile(){
 
     std::string line;
     std::getline(file_,line);
+    data_file::processHeaders(line);
 
     while( std::getline(file_,line) ){
         std::vector<double> lineVect= data_file::processLine(line);
@@ -222,6 +223,26 @@ std::vector<double> data_file::processLine(std::string line){
     return dataVect;
 }
 
+std::vector<std::string> data_file::processHeaders(std::string line){
+    size_t pos=0;
+    contentHeader_= std::vector<std::string>(0,"");
+    while( (pos= line.find(',')) != std::string::npos){
+        std::string parseStr= line.substr(0,pos);
+        parseStr.erase(std::remove(parseStr.begin(),parseStr.end(),'\t'),parseStr.end());
+        contentHeader_.push_back(parseStr);
+        line.erase(0,pos+1);
+    }
+    line.erase(std::remove(line.begin(),line.end(),'\t'),line.end());
+    line.erase(std::remove(line.begin(),line.end(),' '),line.end());
+    contentHeader_.push_back(line);
+
+    return contentHeader_;
+}
+
 std::vector<std::vector<double> > data_file::getContent(){
     return contentBuf_;
+}
+
+std::vector<std::string> data_file::getHeader(){
+    return contentHeader_;
 }

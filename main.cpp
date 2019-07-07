@@ -5,11 +5,11 @@
 
 void testDataFile(){
 
-//    std::string path("~/Desktop/test%/testData%.txt");
-//    data_file datafile(path,"~/Desktop/num/testnum");
+    std::string path("~/Desktop/test%/testData%.csv");
+    data_file datafile(path,"~/Desktop/num/testnum",1);
 
-    std::string path("~/Desktop/testData.csv");
-    data_file datafile(path);
+//    std::string path("~/Desktop/testData.csv");
+//    data_file datafile(path);
 
 
     std::vector<double> v(3,-1);
@@ -61,14 +61,16 @@ void testParse(){
 }
 
 void readFile(){
-    data_file file("~/Desktop/testData.csv",0);
+    data_file file("~/Desktop/knee.csv",0);
     std::vector<std::vector<double> > content= file.getContent();
+    std::vector<std::string> header= file.getHeader();
 
     for(unsigned i=0;i<content.size();i++){
+        printf("%s: ",header.at(i).c_str());
         for(unsigned j=0;j<content.at(i).size();j++){
             printf("%.3f, ",content.at(i).at(j));
         }
-        printf("\n");
+        printf("\n\n\n");
     }
 }
 
