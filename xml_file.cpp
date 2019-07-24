@@ -27,15 +27,15 @@ std::string xml_file::checkPath(std::string path){
 }
 
 boost::property_tree::ptree xml_file::readFile(std::string xml_path){
-    xml_path_= xml_path;
+    xml_path_= xml_file::checkPath(xml_path);
     boost::property_tree::read_xml(xml_path,pt_);
     return pt_;
 }
 
 void xml_file::writeFile(std::string xml_path,boost::property_tree::ptree pt){
+    xml_path_= xml_file::checkPath(xml_path);
     boost::property_tree::xml_writer_settings<std::string> settings(' ', 2,"ASCII");
-    boost::property_tree::write_xml(xml_path,pt,std::locale(),settings);
-    xml_path_= xml_path;
+    boost::property_tree::write_xml(xml_path_,pt,std::locale(),settings);
     return;
 }
 

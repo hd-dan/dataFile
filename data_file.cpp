@@ -21,8 +21,10 @@ data_file::data_file(std::string data_path, std::string num_path, bool write):
             path_.insert(pos,std::to_string(i));
         }
     }
-    data_file::openFile();
-}
+    if (write)
+        data_file::openFile();
+    else
+        data_file::readFile();}
 
 data_file::~data_file(){
     data_file::closeFile();
