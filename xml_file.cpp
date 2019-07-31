@@ -95,8 +95,11 @@ std::vector<std::vector<num> > xml_file::getXmlMat(std::string element_name, std
     BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt_.get_child(element_name)){
         std::vector<num> data_i;
         std::string data_i_name= v.first.data();
-        data_i.push_back(pt_.get<num>(element_name + "." + data_i_name + "." + sub_element.at(0)));
-        data_i.push_back(pt_.get<num>(element_name + "." + data_i_name + "." + sub_element.at(1)));
+        for(unsigned int i=0;i<sub_element.size();i++){
+            try{data_i.push_back(pt_.get<num>(
+                      element_name + "." + data_i_name + "." + sub_element.at(i)));
+            }catch(...){}
+        }
 
         data.push_back(data_i);
     }
@@ -109,7 +112,7 @@ template std::vector<std::vector<std::string> > xml_file::getXmlMat<std::string>
 
 
 template <class num>
-std::vector<std::vector<num> > xml_file::getXmlMat_append(std::string element_name, std::vector<std::string> sub_element){
+std::vector<std::vector<num> > xml_file::getXmlMat_append(std::string element_name){
     std::vector<std::vector<num> > data;
     BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt_.get_child(element_name)){
         std::vector<num> data_i;
@@ -124,10 +127,10 @@ std::vector<std::vector<num> > xml_file::getXmlMat_append(std::string element_na
     }
     return data;
 }
-template std::vector<std::vector<int> > xml_file::getXmlMat_append<int>(std::string, std::vector<std::string>);
-template std::vector<std::vector<double> > xml_file::getXmlMat_append<double>(std::string, std::vector<std::string>);
-template std::vector<std::vector<float> > xml_file::getXmlMat_append<float>(std::string, std::vector<std::string>);
-template std::vector<std::vector<std::string> > xml_file::getXmlMat_append<std::string>(std::string, std::vector<std::string>);
+template std::vector<std::vector<int> > xml_file::getXmlMat_append<int>(std::string);
+template std::vector<std::vector<double> > xml_file::getXmlMat_append<double>(std::string);
+template std::vector<std::vector<float> > xml_file::getXmlMat_append<float>(std::string);
+template std::vector<std::vector<std::string> > xml_file::getXmlMat_append<std::string>(std::string);
 
 
 std::vector<std::vector<double> > xml_file::getXmlMat_2rad(std::string element_name, std::vector<std::string> sub_element){

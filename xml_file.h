@@ -38,7 +38,7 @@ public:
     template <class num>
     std::vector<std::vector<num> > getXmlMat(std::string element_name,std::vector<std::string> sub_element);
     template <class num>
-    std::vector<std::vector<num> > getXmlMat_append(std::string element_name,std::vector<std::string> sub_element);
+    std::vector<std::vector<num> > getXmlMat_append(std::string element_name);
 
     std::vector<double> getXmlVect_2rad(std::string element_name);
     std::vector<std::vector<double> > getXmlMat_2rad(std::string element_name,std::vector<std::string> sub_element);
