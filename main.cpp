@@ -77,9 +77,9 @@ void readFile(){
 int main(){
     std::cout << "Hello World!" << std::endl;
 
-//    testDataFile();
+    testDataFile();
 //    testParse();
-    readFile();
+//    readFile();
 
     return 0;
 }
