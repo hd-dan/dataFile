@@ -1,6 +1,8 @@
 #include <iostream>
 #include "data_file.h"
 
+#include "df_file.h"
+
 //#include "../util/joystick.h"
 
 void testDataFile(){
@@ -74,12 +76,19 @@ void readFile(){
     }
 }
 
+void testDf(){
+    df_file df("~/Dan/test.danf");
+    int i= df.readFile();
+    printf("result:%d\n",i);
+}
+
 int main(){
     std::cout << "Hello World!" << std::endl;
 
-    testDataFile();
+//    testDataFile();
 //    testParse();
 //    readFile();
 
+    testDf();
     return 0;
 }
