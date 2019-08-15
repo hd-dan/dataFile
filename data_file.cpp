@@ -213,7 +213,7 @@ std::vector<std::vector<double> > data_file::readFile(){
 std::vector<double> data_file::processLine(std::string line){
     size_t pos=0;
     std::vector<double> dataVect;
-    while( (pos= line.find(',')) != std::string::npos){
+    while( (pos= line.find(delimiter_)) != std::string::npos){
         std::string parseStr= line.substr(0,pos);
         double parseVal= std::stod(parseStr);
         dataVect.push_back(parseVal);
