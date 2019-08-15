@@ -44,6 +44,7 @@ public:
 
     void setPath(std::string path);
     bool openForWrite();
+    int readFile(std::string path);
     int readFile();
 
     double getElementVal(std::string name);

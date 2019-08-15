@@ -41,6 +41,10 @@ bool df_file::closeFile(){
     return (!fopen_);
 }
 
+int df_file::readFile(std::string path){
+    path_= df_file::processPath(path);
+    return df_file::readFile();
+}
 
 int df_file::readFile(){
     file_.close();
@@ -266,7 +270,7 @@ double df_file::getElementVal(std::string name){
             && elements_.at(i).second.type()==typeid(double))
             return boost::any_cast<double> (elements_.at(i).second);
     }
-    printf("Element %s Not Found || Type not comply\n",name.c_str());
+//    printf("Element %s Not Found || Type not comply\n",name.c_str());
     return -1;
 }
 
@@ -276,7 +280,7 @@ std::vector<double> df_file::getElementVect(std::string name){
             && elements_.at(i).second.type()==typeid(std::vector<double>) )
                 return boost::any_cast<std::vector<double> >(elements_.at(i).second);
     }
-    printf("Element %s Not Found || Type not comply\n",name.c_str());
+//    printf("Element %s Not Found || Type not comply\n",name.c_str());
     return std::vector<double>(0,-1);
 }
 
@@ -288,7 +292,7 @@ std::vector<std::vector<double> > df_file::getElementMat(std::string name){
             return boost::any_cast<std::vector<std::vector<double> > >
                                             (elements_.at(i).second);
     }
-    printf("Element %s Not Found || Type not comply\n",name.c_str());
+//    printf("Element %s Not Found || Type not comply\n",name.c_str());
     return std::vector<std::vector<double> >(0,std::vector<double>(0,-1));
 }
 
@@ -305,6 +309,6 @@ int df_file::getElementType(std::string name){
             return 0;
         }
     }
-    printf("Element %s Not Found\n",name.c_str());
+//    printf("Element %s Not Found\n",name.c_str());
     return -1;
 }
