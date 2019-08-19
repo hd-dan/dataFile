@@ -1,12 +1,13 @@
 #include "df_file.h"
 
-df_file::df_file():fopen_(false){
+df_file::df_file():fopen_(false),fcomment_(true){
     df_file::init();
 }
 
-df_file::df_file(std::string path):fopen_(false){
-    path_= df_file::processPath(path);
+df_file::df_file(std::string path,bool fcomment):fopen_(false),fcomment_(fcomment){
     df_file::init();
+    df_file::setCommentFlag(fcomment);
+    df_file::setPath(path);
 }
 
 df_file::~df_file(){
@@ -19,10 +20,13 @@ void df_file::init(){
     nameDelimiter_= ":";
     vectDelimiter_= ",";
     matDelimiter_= ";";
+
+    commentBuff_= "";
 }
 
 void df_file::setPath(std::string path){
     path_= df_file::processPath(path);
+    df_file::readFile();
     return;
 }
 
@@ -57,8 +61,10 @@ int df_file::readFile(){
     int i=0;
     while ( std::getline(file_,line)){
         ssize_t pos= line.find(commentStr_);
-        if (pos!=std::string::npos)
+        if (pos!=std::string::npos){
+            commentBuff_= commentBuff_+ line.substr(pos,std::string::npos)+"\n";
             line= line.substr(0,pos);
+        }
 
         strBuff_+= line;
         bool fmat= (strBuff_.find('[')!=std::string::npos &&
@@ -66,6 +72,7 @@ int df_file::readFile(){
         bool fval= (strBuff_.find('[')==std::string::npos && strBuff_.size()>0);
 
         if (fmat||fval){
+            if (fcomment_) commentBuff_= commentBuff_+commentStr_+strBuff_+"\n";
             df_file::processElementStr(strBuff_,fmat);
             i++;
         }
@@ -167,7 +174,8 @@ int df_file::changeElement(std::string name, double x){
             return int(i);
         }
     }
-    return -1;
+    elements_.push_back( std::make_pair(name,x) );
+    return elements_.size()-1;
 }
 int df_file::changeElement(std::string name, std::vector<double> x){
     for (unsigned int i=0;i<elements_.size();i++){
@@ -176,7 +184,8 @@ int df_file::changeElement(std::string name, std::vector<double> x){
             return int(i);
         }
     }
-    return -1;
+    elements_.push_back( std::make_pair(name,x) );
+    return elements_.size()-1;
 }
 int df_file::changeElement(std::string name, std::vector<std::vector<double> > x){
     for (unsigned int i=0;i<elements_.size();i++){
@@ -185,7 +194,8 @@ int df_file::changeElement(std::string name, std::vector<std::vector<double> > x
             return int(i);
         }
     }
-    return -1;
+    elements_.push_back( std::make_pair(name,x) );
+    return elements_.size()-1;
 }
 
 void df_file::clearElements(){
@@ -213,6 +223,9 @@ bool df_file::openForWrite(){
 void df_file::writeElements(){
     df_file::closeFile();
     df_file::openForWrite();
+
+    if (commentBuff_.size()>0)
+        file_<< commentBuff_ << std::endl;
 
     for (unsigned int i=0;i<elements_.size();i++){
         std::pair<std::string,boost::any> elementi= elements_.at(i);
@@ -311,4 +324,9 @@ int df_file::getElementType(std::string name){
     }
 //    printf("Element %s Not Found\n",name.c_str());
     return -1;
+}
+
+void df_file::setCommentFlag(bool fcomment){
+    fcomment_= fcomment;
+    return;
 }

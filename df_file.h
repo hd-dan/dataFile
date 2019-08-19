@@ -9,6 +9,8 @@
 #include <boost/any.hpp>
 #include <map>
 
+#include <iostream>
+
 class df_file{
 private:
     std::fstream file_;
@@ -36,9 +38,12 @@ private:
     void writeVect(std::string name, boost::any vect);
     void writeMat(std::string name, boost::any mat);
 
+    bool fcomment_;
+    std::string commentBuff_;
+
 public:
     df_file();
-    df_file(std::string path);
+    df_file(std::string path, bool fcomment=true);
     ~df_file();
     bool closeFile();
 
@@ -62,6 +67,7 @@ public:
 
     void clearElements();
     void writeElements();
+    void setCommentFlag(bool fcomment);
 
 };
 

@@ -77,12 +77,23 @@ void readFile(){
 }
 
 
+void testDf(){
+    df_file df("~/Dan/trolleyInsertion/config/uwb.df",true);
+
+    df.changeElement("uwb1",std::vector<double>{2.1,0.5});
+    std::vector<double> uwb1= df.getElementVect("uwb1");
+    printf("uwb: %.3f,%.3f\n",uwb1.at(0),uwb1.at(1));
+    df.writeElements();
+}
+
 int main(){
     std::cout << "Hello World!" << std::endl;
 
-    testDataFile();
+//    testDataFile();
 //    testParse();
 //    readFile();
+
+    testDf();
 
     return 0;
 }
