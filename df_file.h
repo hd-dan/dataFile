@@ -51,10 +51,13 @@ public:
     bool openForWrite();
     int readFile(std::string path);
     int readFile();
-
     double getElementVal(std::string name);
+    double getElementVal(std::string name, double x);
     std::vector<double> getElementVect(std::string name);
+    std::vector<double> getElementVect(std::string name, std::vector<double> x);
     std::vector<std::vector<double> > getElementMat(std::string name);
+    std::vector<std::vector<double> > getElementMat(std::string name,
+                                                std::vector<std::vector<double> > x);
     int getElementType(std::string name);
 
     void addElement(std::string name, double x);

@@ -277,27 +277,34 @@ void df_file::writeMat(std::string name, boost::any mat){
 }
 
 
-double df_file::getElementVal(std::string name){
+double df_file::getElementVal(std::string name, double x){
     for (unsigned int i=0;i<elements_.size();i++){
         if (!elements_.at(i).first.compare(name)
             && elements_.at(i).second.type()==typeid(double))
             return boost::any_cast<double> (elements_.at(i).second);
     }
 //    printf("Element %s Not Found || Type not comply\n",name.c_str());
-    return -1;
+    return x;
+}
+double df_file::getElementVal(std::string name){
+    return df_file::getElementVal(name,-1);
 }
 
-std::vector<double> df_file::getElementVect(std::string name){
+std::vector<double> df_file::getElementVect(std::string name, std::vector<double> x){
     for (unsigned int i=0;i<elements_.size();i++){
         if (!elements_.at(i).first.compare(name)
             && elements_.at(i).second.type()==typeid(std::vector<double>) )
                 return boost::any_cast<std::vector<double> >(elements_.at(i).second);
     }
 //    printf("Element %s Not Found || Type not comply\n",name.c_str());
-    return std::vector<double>(0,-1);
+    return x;
+}
+std::vector<double> df_file::getElementVect(std::string name){
+    return df_file::getElementVect(name,std::vector<double>(0,-1));
 }
 
-std::vector<std::vector<double> > df_file::getElementMat(std::string name){
+std::vector<std::vector<double> > df_file::getElementMat(std::string name,
+                                            std::vector<std::vector<double> > x){
     for (unsigned int i=0;i<elements_.size();i++){
         if (!elements_.at(i).first.compare(name)
             && elements_.at(i).second.type()==typeid(
@@ -306,8 +313,13 @@ std::vector<std::vector<double> > df_file::getElementMat(std::string name){
                                             (elements_.at(i).second);
     }
 //    printf("Element %s Not Found || Type not comply\n",name.c_str());
-    return std::vector<std::vector<double> >(0,std::vector<double>(0,-1));
+    return x;
 }
+std::vector<std::vector<double> > df_file::getElementMat(std::string name){
+    return df_file::getElementMat(name,
+                    std::vector<std::vector<double> >(0,std::vector<double>(0,-1)));
+}
+
 
 int df_file::getElementType(std::string name){
     for (unsigned int i=0;i<elements_.size();i++){
