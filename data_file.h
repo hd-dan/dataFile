@@ -13,17 +13,25 @@
 
 #include <boost/any.hpp>
 
+#include <dirent.h>
+
 class data_file{
 private:
     std::fstream file_;
     std::string path_;
-    bool open_;
+    bool fopen_;
+    float openNum_;
 
-    std::vector<boost::any> recordBuffer_;
-    int getFileNum(std::string num_path);
-    
+    std::string processPath(std::string path);
+    int getFileNum(std::string path);
+    int extractIntFromStr(std::string numStr);
+    int fileNum_;
+
     char delimiter_;
     bool rmExtraDelimiter();
+
+    std::vector<boost::any> recordBuffer_;
+    std::stringstream headerBuf_;
 
     std::vector<std::vector<double> > contentBuf_;
     std::vector<std::string> contentHeader_;
@@ -31,14 +39,17 @@ private:
     std::vector<std::string> processHeaders(std::string line);
 
 public:
-    data_file(std::string data_path, bool write=1);
-    data_file(std::string data_path, std::string num_path, bool write=1);
+    data_file();
+    data_file(std::string path, bool write=1);
     ~data_file();
     bool openFile();
+    bool openFile(std::string path);
 
     bool header(std::string name);
     template <class num>
     bool header(std::string name, std::vector<num> x);
+
+    bool addComment(std::string comment);
 
 
     template <class num>

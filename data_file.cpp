@@ -1,65 +1,100 @@
 #include "data_file.h"
 
 
-data_file::data_file(std::string data_path, bool write):
-                            path_(data_path), open_(false){
-    if (path_.at(0)=='~')
-        path_= getenv("HOME")+path_.substr(1,path_.size()-1);
+data_file::data_file(std::string path, bool write):path_(path), fopen_(false),openNum_(0){
     if (write)
         data_file::openFile();
     else
         data_file::readFile();
 }
+data_file::data_file():fopen_(false),openNum_(0){
 
-data_file::data_file(std::string data_path, std::string num_path, bool write):
-                            path_(data_path),open_(false){
-    int i= getFileNum(num_path);
-    for (int j=0;j<2;j++){
-        std::size_t pos= path_.find('%');
-        if (pos!=std::string::npos){
-            path_.erase(pos,1);
-            path_.insert(pos,std::to_string(i));
-        }
-    }
-    if (write)
-        data_file::openFile();
-    else
-        data_file::readFile();}
+}
 
 data_file::~data_file(){
     data_file::closeFile();
 }
 
-int data_file::getFileNum(std::string num_path){
-    if (num_path.at(0)=='~')
-        num_path= getenv("HOME")+num_path.substr(1,num_path.size()-1);
-    std::string dir= num_path.substr(0,num_path.find_last_of('/'));
-    struct stat st;
-    if (stat(dir.c_str(),&st)!=0)
-        mkdir(dir.c_str(),S_IRWXU);
+std::string data_file::processPath(std::string path){
+    path_= path;
+    if (path_.at(0)=='~')
+        path_= getenv("HOME")+path_.substr(1);
 
-    std::fstream file;
-    int i=0;
-
-    file.open(num_path,std::ios::in);
-    if (file.is_open()){
-        std::string line;
-        std::getline(file,line);
-        i= std::stoi(line);
-        file.close();
+    size_t pos= path_.find("%");
+    if (pos==path_.npos){
+        fileNum_= data_file::getFileNum(path_);
+        size_t dotpos= path_.find(".");
+        if (dotpos==std::string::npos)
+            dotpos= path_.size();
+        path_.insert(dotpos,std::to_string(fileNum_));
+    }else{
+        fileNum_= data_file::getFileNum(path_.substr(0,pos));
+        do {
+            path_.erase(pos,1);
+            path_.insert(pos,std::to_string(fileNum_));
+        }while( (pos=path_.find("%"))!=std::string::npos);
     }
-    file.open(num_path, std::ios::out|std::ios::trunc);
-    file<<i+1;
-    file.close();
-    return i;
+    return path_;
+}
+
+int data_file::getFileNum(std::string path){
+    std::string pathdir;
+    std::string name;
+    size_t dirpos= path.rfind("/");
+    if (dirpos!=path.npos){
+        pathdir= path.substr(0,dirpos);
+        name= path.substr(dirpos+1);
+        name= name.substr(0,name.find("."));
+    }
+
+    int fileNum=0;
+    DIR *dir= opendir(pathdir.c_str());
+    if (dir){
+        struct dirent *ent;
+        while((ent=readdir(dir))!=NULL){
+            if (!strcmp(ent->d_name,".")) continue;
+            if (!strcmp(ent->d_name,"..")) continue;
+            if (ent->d_name[0]=='.') continue;
+
+            std::string filename= ent->d_name;
+            filename= filename.substr(0,filename.find("."));
+            size_t pos= filename.find(name);
+            if (pos!=filename.npos){
+                filename= filename.substr(pos+name.size());
+                int i= extractIntFromStr(filename);
+                fileNum= (fileNum<=i)? i+1:fileNum;
+            }
+        }
+    }
+    return fileNum;
+}
+
+int data_file::extractIntFromStr(std::string numStr){
+    unsigned int i=0;
+    unsigned int digitSum=0;
+    for (unsigned int j=0;j<numStr.size();j++){
+        i= (digitSum==0 && isdigit(numStr.at(j)))? j:i;
+        if (i!=0 && !isdigit(numStr.at(j)))
+            break;
+        if (isdigit(numStr.at(j))) digitSum++;
+    }
+    if (digitSum==0)
+        return 0;
+    return std::stoi(numStr.substr(i,digitSum));
 }
 
 bool data_file::openFile(){
-    delimiter_= ',';
-    if (path_.at(0)=='~')
-        path_= getenv("HOME")+path_.substr(1,path_.size()-1);
+    return data_file::openFile(path_);
+}
 
-    std::string dir= path_.substr(0,path_.find_last_of('/'));
+bool data_file::openFile(std::string path){
+    if (fopen_)
+        data_file::closeFile();
+
+    delimiter_= ',';
+    path_= data_file::processPath(path);
+
+    std::string dir= path_.substr(0,path_.rfind('/'));
     struct stat st;
     if (stat(dir.c_str(),&st)!=0){
         mkdir(dir.c_str(),S_IRWXU);
@@ -71,31 +106,32 @@ bool data_file::openFile(){
        file_.close();
        file_.open(path_.c_str(), std::ios::in|std::ios::out);
     }
-    open_=file_.is_open();
-    return open_;
+    fopen_=file_.is_open();
+    openNum_+=float(0.5);
+    return fopen_;
 }
 
 
 bool data_file::closeFile(){
-    if (open_){
+    if (fopen_){
        data_file::rmExtraDelimiter();
        file_.close();
-       open_=file_.is_open();
+       fopen_=file_.is_open();
     }
-    return (!open_);
+    return (!fopen_);
 }
 
 
 bool data_file::header(std::string name){
-    if (!open_) return false;
+    if (!fopen_) return false;
 
-    file_<<name.c_str()<< delimiter_<<"\t";
+    file_<< name.c_str()<< delimiter_<<"\t";
     return true;
 }
 
 template <class num>
 bool data_file::header(std::string name, std::vector<num> x){
-    if (!open_) return false;
+    if (!fopen_) return false;
 
     for (unsigned long i=0; i<x.size();i++){
        file_ << name <<"["<<i<<"]" << delimiter_<<"\t";
@@ -107,9 +143,15 @@ template bool data_file::header<float>(std::string,std::vector<float>);
 template bool data_file::header<int>(std::string,std::vector<int>);
 
 
+bool data_file::addComment(std::string comment){
+    if (!fopen_) return false;
+    file_<< "#" << comment << std::endl;
+    return true;
+}
+
 template <class num>
 bool data_file::write(std::vector<num> x){
-    if (!open_) return false;
+    if (!fopen_) return false;
 
     for (unsigned long i=0;i<x.size();i++){
         file_<< x.at(i) << delimiter_<<"\t";
@@ -124,9 +166,9 @@ template bool data_file::write<int>(std::vector<int>);
 
 template <class num>
 bool data_file::write(num x){
-    if (!open_) return false;
+    if (!fopen_) return false;
 
-    file_ <<x << delimiter_<<"\t";
+    file_ << x << delimiter_<<"\t";
     return true;
 }
 template bool data_file::write<double>(double);
@@ -134,7 +176,7 @@ template bool data_file::write<float>(float);
 template bool data_file::write<int>(int);
 
 bool data_file::endLine(){
-    if (!open_)
+    if (!fopen_)
         return false;
     file_<<std::endl;
     return true;
@@ -152,12 +194,16 @@ bool data_file::rmExtraDelimiter(){
 }
 
 void data_file::recordTarget(std::string name, double &data){
-    data_file::header(name);
+//    data_file::header(name);
+    headerBuf_<< name.c_str()<< delimiter_<<"\t";
     data_file::recordTarget(data);
 }
 
 void data_file::recordTarget(std::string name, std::vector<double> &data){
-    data_file::header(name,data);
+//    data_file::header(name,data);
+    for (unsigned long i=0; i<data.size();i++){
+        headerBuf_ << name <<"["<<i<<"]" << delimiter_<<"\t";
+     }
     data_file::recordTarget(data);
 }
 
@@ -170,7 +216,11 @@ void data_file::recordTarget(std::vector<double> &data){
 }
 
 void data_file::record(){
-    
+    if ( int(2*openNum_)%2==1 && !headerBuf_.str().empty()){
+        file_ << headerBuf_.str();
+        openNum_+=float(0.5);
+    }
+
     data_file::rmExtraDelimiter();
     data_file::endLine();
     for (unsigned int i=0;i<recordBuffer_.size();i++){
