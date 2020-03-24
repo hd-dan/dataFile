@@ -142,6 +142,7 @@ bool data_file::closeFile(){
 bool data_file::header(std::string name){
     if (!fopen_) return false;
 
+    std::lock_guard<std::mutex> lockWrite(mtxWrite_);
     file_<< name.c_str()<< delimiter_<<"\t";
     return true;
 }
@@ -150,6 +151,7 @@ template <class num>
 bool data_file::header(std::string name, std::vector<num> x){
     if (!fopen_) return false;
 
+    std::lock_guard<std::mutex> lockWrite(mtxWrite_);
     for (unsigned long i=0; i<x.size();i++){
        file_ << name <<"["<<i<<"]" << delimiter_<<"\t";
     }
@@ -162,6 +164,7 @@ template bool data_file::header<int>(std::string,std::vector<int>);
 
 bool data_file::addComment(std::string comment){
     if (!fopen_) return false;
+    std::lock_guard<std::mutex> lockWrite(mtxWrite_);
     file_<< "#" << comment << std::endl;
     return true;
 }
@@ -170,6 +173,7 @@ template <class num>
 bool data_file::write(std::vector<num> x){
     if (!fopen_) return false;
 
+    std::lock_guard<std::mutex> lockWrite(mtxWrite_);
     for (unsigned long i=0;i<x.size();i++){
         file_<< x.at(i) << delimiter_<<"\t";
     }
@@ -185,6 +189,7 @@ template <class num>
 bool data_file::write(num x){
     if (!fopen_) return false;
 
+    std::lock_guard<std::mutex> lockWrite(mtxWrite_);
     file_ << x << delimiter_<<"\t";
     return true;
 }
@@ -195,6 +200,7 @@ template bool data_file::write<int>(int);
 bool data_file::endLine(){
     if (!fopen_)
         return false;
+    std::lock_guard<std::mutex> lockWrite(mtxWrite_);
     file_<<std::endl;
     return true;
 }
@@ -233,6 +239,7 @@ void data_file::recordTarget(std::vector<double> &data){
 }
 
 void data_file::record(){
+    std::lock_guard<std::mutex> lockWrite(mtxWrite_);
     if ( int(2*openNum_)%2==1 && !headerBuf_.str().empty()){
         file_ << headerBuf_.str();
         openNum_+=float(0.5);

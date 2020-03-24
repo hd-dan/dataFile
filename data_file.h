@@ -10,10 +10,10 @@
 //For Writing data
 #include <fstream>
 #include <sys/stat.h>
+#include <dirent.h>
 
 #include <boost/any.hpp>
-
-#include <dirent.h>
+#include <mutex>
 
 class data_file{
 private:
@@ -38,6 +38,8 @@ private:
     std::vector<std::string> contentHeader_;
     std::vector<double> processLine(std::string line);
     std::vector<std::string> processHeaders(std::string line);
+
+    std::mutex mtxWrite_;
 
 public:
     data_file();
