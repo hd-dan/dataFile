@@ -19,6 +19,18 @@ std::string data_file::processPath(std::string path){
     path_= path;
     if (path_.at(0)=='~')
         path_= getenv("HOME")+path_.substr(1);
+    if (path_.find("..")==0){
+        std::string pwd= getenv("PWD");
+        do{
+            pwd= pwd.substr(0,pwd.rfind("/"));
+            path_= path_.substr(path_.find("..")+2);
+        }while(path_.find("..")<2);
+        path_= pwd+path_;
+
+    }else if(path_.at(0)=='.')
+        path_= getenv("PWD")+path_.substr(1);
+    if (path_.find("/")==path_.npos)
+        path_= getenv("PWD")+std::string("/")+path_;
 
     size_t pos= path_.find("%");
     if (pos==path_.npos){
@@ -83,6 +95,16 @@ int data_file::extractIntFromStr(std::string numStr){
     return std::stoi(numStr.substr(i,digitSum));
 }
 
+void data_file::processDirectory(std::string dir){
+    dir= dir.substr(0,dir.rfind('/'));
+    struct stat st;
+    if (stat(dir.c_str(),&st)!=0){
+        data_file::processDirectory(dir);
+        mkdir(dir.c_str(),S_IRWXU);
+    }
+    return;
+}
+
 bool data_file::openFile(){
     return data_file::openFile(path_);
 }
@@ -93,12 +115,7 @@ bool data_file::openFile(std::string path){
 
     delimiter_= ',';
     path_= data_file::processPath(path);
-
-    std::string dir= path_.substr(0,path_.rfind('/'));
-    struct stat st;
-    if (stat(dir.c_str(),&st)!=0){
-        mkdir(dir.c_str(),S_IRWXU);
-    }
+    data_file::processDirectory(path_);
 
     if(!file_.is_open()){
        file_.open(path_.c_str(), std::ios::out|std::ios::trunc);

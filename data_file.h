@@ -23,6 +23,7 @@ private:
     float openNum_;
 
     std::string processPath(std::string path);
+    void processDirectory(std::string dir);
     int getFileNum(std::string path);
     int extractIntFromStr(std::string numStr);
     int fileNum_;
