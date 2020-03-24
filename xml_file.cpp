@@ -13,16 +13,27 @@ xml_file::~xml_file(){
 }
 
 std::string xml_file::checkPath(std::string path){
-    if (path.at(0)=='~'){
-        path.erase(0,1);
-        path= std::string("/home/") + getenv("LOGNAME") + path;
-    }
+    if (path.at(0)=='~')
+        path= getenv("HOME")+path.substr(1);
+    if (path.find("..")==0){
+        std::string pwd= getenv("PWD");
+        do{
+            pwd= pwd.substr(0,pwd.rfind("/"));
+            path= path.substr(path.find("..")+2);
+        }while(path.find("..")<2);
+        path= pwd+path;
+
+    }else if(path.at(0)=='.')
+        path= getenv("PWD")+path.substr(1);
+    if (path.find("/")==path.npos)
+        path= getenv("PWD")+std::string("/")+path;
 
     std::string dir= path.substr(0,path.find_last_of('/'));
     struct stat st;
     if (stat(dir.c_str(),&st)!=0){
         mkdir(dir.c_str(),S_IRWXU);
     }
+
     return path;
 }
 

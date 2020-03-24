@@ -32,7 +32,20 @@ void df_file::setPath(std::string path){
 
 std::string df_file::processPath(std::string path){
     if (path.at(0)=='~')
-        path= getenv("HOME")+path.substr(1,path.size()-1);
+        path= getenv("HOME")+path.substr(1);
+    if (path.find("..")==0){
+        std::string pwd= getenv("PWD");
+        do{
+            pwd= pwd.substr(0,pwd.rfind("/"));
+            path= path.substr(path.find("..")+2);
+        }while(path.find("..")<2);
+        path= pwd+path;
+
+    }else if(path.at(0)=='.')
+        path= getenv("PWD")+path.substr(1);
+    if (path.find("/")==path.npos)
+        path= getenv("PWD")+std::string("/")+path;
+
     path_= path;
     return path;
 }
