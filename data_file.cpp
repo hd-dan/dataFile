@@ -23,7 +23,6 @@ std::string data_file::processPath(std::string path){
 //        std::string pwd= getenv("PWD");
         char tuh[PATH_MAX];
         std::string pwd=getcwd(tuh,sizeof(tuh));
-        pwd= pwd.substr(0,pwd.rfind("/"));
         do{
             pwd= pwd.substr(0,pwd.rfind("/"));
             path_= path_.substr(path_.find("..")+2);

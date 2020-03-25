@@ -19,9 +19,7 @@ std::string xml_file::processPath(std::string path){
 //        std::string pwd= getenv("PWD");
         char tuh[PATH_MAX];
         std::string pwd=getcwd(tuh,sizeof(tuh));
-        pwd= pwd.substr(0,pwd.rfind("/"));
         do{
-            printf("%s\n",pwd.c_str());
             pwd= pwd.substr(0,pwd.rfind("/"));
             path= path.substr(path.find("..")+2);
         }while(path.find("..")<2);
