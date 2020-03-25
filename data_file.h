@@ -63,6 +63,8 @@ public:
     bool endLine();
     bool closeFile();
 
+    void recordTarget(std::string name, bool &data);
+    void recordTarget(std::string name, int &data);
     void recordTarget(std::string name, double &data);
     void recordTarget(double &data);
     void recordTarget(std::string name, std::vector<double> &data);

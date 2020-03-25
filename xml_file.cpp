@@ -5,19 +5,23 @@ xml_file::xml_file(){
 }
 
 xml_file::xml_file(std::string xml_path){
-    xml_path_= xml_file::checkPath(xml_path);
+    xml_path_= xml_file::processPath(xml_path);
     pt_= xml_file::readFile(xml_path_);
 }
 
 xml_file::~xml_file(){
 }
 
-std::string xml_file::checkPath(std::string path){
+std::string xml_file::processPath(std::string path){
     if (path.at(0)=='~')
         path= getenv("HOME")+path.substr(1);
     if (path.find("..")==0){
-        std::string pwd= getenv("PWD");
+//        std::string pwd= getenv("PWD");
+        char tuh[PATH_MAX];
+        std::string pwd=getcwd(tuh,sizeof(tuh));
+        pwd= pwd.substr(0,pwd.rfind("/"));
         do{
+            printf("%s\n",pwd.c_str());
             pwd= pwd.substr(0,pwd.rfind("/"));
             path= path.substr(path.find("..")+2);
         }while(path.find("..")<2);
@@ -28,23 +32,29 @@ std::string xml_file::checkPath(std::string path){
     if (path.find("/")==path.npos)
         path= getenv("PWD")+std::string("/")+path;
 
-    std::string dir= path.substr(0,path.find_last_of('/'));
-    struct stat st;
-    if (stat(dir.c_str(),&st)!=0){
-        mkdir(dir.c_str(),S_IRWXU);
-    }
+    xml_file::processDirectory(path);
 
     return path;
 }
 
+void xml_file::processDirectory(std::string dir){
+    dir= dir.substr(0,dir.rfind('/'));
+    struct stat st;
+    if (stat(dir.c_str(),&st)!=0){
+        xml_file::processDirectory(dir);
+        mkdir(dir.c_str(),S_IRWXU);
+    }
+    return;
+}
+
 boost::property_tree::ptree xml_file::readFile(std::string xml_path){
-    xml_path_= xml_file::checkPath(xml_path);
+    xml_path_= xml_file::processPath(xml_path);
     boost::property_tree::read_xml(xml_path,pt_);
     return pt_;
 }
 
 void xml_file::writeFile(std::string xml_path,boost::property_tree::ptree pt){
-    xml_path_= xml_file::checkPath(xml_path);
+    xml_path_= xml_file::processPath(xml_path);
     boost::property_tree::xml_writer_settings<std::string> settings(' ', 2,"ASCII");
     boost::property_tree::write_xml(xml_path_,pt,std::locale(),settings);
     return;

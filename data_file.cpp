@@ -20,7 +20,10 @@ std::string data_file::processPath(std::string path){
     if (path_.at(0)=='~')
         path_= getenv("HOME")+path_.substr(1);
     if (path_.find("..")==0){
-        std::string pwd= getenv("PWD");
+//        std::string pwd= getenv("PWD");
+        char tuh[PATH_MAX];
+        std::string pwd=getcwd(tuh,sizeof(tuh));
+        pwd= pwd.substr(0,pwd.rfind("/"));
         do{
             pwd= pwd.substr(0,pwd.rfind("/"));
             path_= path_.substr(path_.find("..")+2);
@@ -214,6 +217,16 @@ bool data_file::rmExtraDelimiter(){
         return true;
     }
     return false;
+}
+
+void data_file::recordTarget(std::string name, int &data){
+    headerBuf_<< name.c_str()<< delimiter_<<"\t";
+    recordBuffer_.push_back(&data);
+}
+
+void data_file::recordTarget(std::string name, bool &data){
+    headerBuf_<< name.c_str()<< delimiter_<<"\t";
+    recordBuffer_.push_back(&data);
 }
 
 void data_file::recordTarget(std::string name, double &data){

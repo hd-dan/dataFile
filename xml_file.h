@@ -16,7 +16,8 @@ private:
     boost::property_tree::ptree pt_;
     std::string xml_path_;
 
-    std::string checkPath(std::string);
+    std::string processPath(std::string path);
+    void processDirectory(std::string dir);
 
 public:
     xml_file();

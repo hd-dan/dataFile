@@ -84,14 +84,34 @@ void testDf(){
     printf("trolley:%.3f | test:%.3f\n",trolley,test);
 }
 
+void testXml(){
+    std::string configPath= "../ur_robot/config/robotConfig.xml";
+
+    char tuh[PATH_MAX];
+    std::string pwd=getcwd(tuh,sizeof(tuh));
+    printf("erm: %s\n",pwd.c_str());
+
+
+    xml_file robotConfigFile(configPath);
+    std::string urConfig= robotConfigFile.getXmlVal<std::string>("robot.urConfig","../config/urConfig.xml");
+    std::string ftConfig= robotConfigFile.getXmlVal<std::string>("robot.ftConfig","../config/ftConfig.xml");
+    std::string drillConfig= robotConfigFile.getXmlVal<std::string>("robot.drillConfig","../config/drillConfig.xml");
+
+    printf("urConfig: %s\n",urConfig.c_str());
+    printf("ftConfig: %s\n",ftConfig.c_str());
+    printf("drillConfig: %s\n",drillConfig.c_str());
+    return;
+}
+
 int main(){
     std::cout << "Hello World!" << std::endl;
 
-    testDataFile();
+//    testDataFile();
 //    testParse();
 //    readFile();
 
 //    testDf();
+    testXml();
 
     return 0;
 }
