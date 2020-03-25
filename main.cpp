@@ -1,6 +1,6 @@
 #include <iostream>
 #include "data_file.h"
-
+#include "xml_file.h"
 #include "df_file.h"
 
 //#include "../util/joystick.h"
@@ -8,11 +8,10 @@
 void testDataFile(){
 
     std::string path("~/Desktop/test%/testData%.csv");
-    data_file datafile(path,"~/Desktop/num/testnum",1);
+    data_file datafile(path,true);
 
 //    std::string path("~/Desktop/testData.csv");
 //    data_file datafile(path);
-
 
     std::vector<double> v(3,-1);
     std::vector<double> x(2,10);
@@ -88,11 +87,11 @@ void testDf(){
 int main(){
     std::cout << "Hello World!" << std::endl;
 
-//    testDataFile();
+    testDataFile();
 //    testParse();
 //    readFile();
 
-    testDf();
+//    testDf();
 
     return 0;
 }
