@@ -2,13 +2,13 @@
 
 
 data_file::data_file(std::string path, bool write):path_(path), fwrite_(write),
-                    fopen_(false),openNum_(0){
+                    fopen_(false),openNum_(0),delimiter_(','){
     if (write)
         data_file::openFile();
     else
         data_file::readFile();
 }
-data_file::data_file():fopen_(false),openNum_(0){
+data_file::data_file():fopen_(false),openNum_(0),delimiter_(','){
 
 }
 
@@ -305,21 +305,22 @@ std::vector<std::vector<double> > data_file::readFile(){
 }
 
 std::vector<double> data_file::processLine(std::string line){
-//    printf("%s\n",line.c_str());
     size_t pos=0;
     std::vector<double> dataVect;
     while( (pos= line.find(delimiter_)) != std::string::npos){
         std::string parseStr= line.substr(0,pos);
-//        printf("%s |",parseStr.c_str());
+//        printf("| %s |\n",parseStr.c_str());
         double parseVal= std::stod(parseStr);
         dataVect.push_back(parseVal);
-//        printf("%s\n",line.c_str());
 
         line= line.substr(line.find(delimiter_)+1);
-//        printf("%s\n",line.c_str());
+//        printf("%s\n\n",line.c_str());
     }
-    double parseVal= std::stod(line);
-    dataVect.push_back(parseVal);
+
+    if (line.find_first_not_of(" ")!=line.npos && line.find_first_not_of("\t")!=line.npos){
+        double parseVal= std::stod(line);
+        dataVect.push_back(parseVal);
+    }
 
 //    for (unsigned int i=0;i<dataVect.size();i++)
 //        printf("%.3f, ",dataVect.at(i));
