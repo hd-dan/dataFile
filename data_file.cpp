@@ -1,7 +1,8 @@
 #include "data_file.h"
 
 
-data_file::data_file(std::string path, bool write):path_(path), fopen_(false),openNum_(0){
+data_file::data_file(std::string path, bool write):path_(path), fwrite_(write),
+                    fopen_(false),openNum_(0){
     if (write)
         data_file::openFile();
     else
@@ -33,6 +34,9 @@ std::string data_file::processPath(std::string path){
         path_= getenv("PWD")+path_.substr(1);
     if (path_.find("/")==path_.npos)
         path_= getenv("PWD")+std::string("/")+path_;
+
+    if (!fwrite_)
+        return path_;
 
     size_t pos= path_.find("%");
     if (pos==path_.npos){
@@ -274,6 +278,8 @@ void data_file::record(){
 }
 
 std::vector<std::vector<double> > data_file::readFile(){
+    fwrite_=false;
+    path_= data_file::processPath(path_);
     file_.close();
     file_.open(path_,std::ios::in);
     file_.seekg(0,file_.beg);
@@ -283,6 +289,8 @@ std::vector<std::vector<double> > data_file::readFile(){
     data_file::processHeaders(line);
 
     while( std::getline(file_,line) ){
+        if (line.empty())
+            continue;
         std::vector<double> lineVect= data_file::processLine(line);
         if (contentBuf_.size()==0){
             contentBuf_= std::vector<std::vector<double> >
@@ -297,16 +305,25 @@ std::vector<std::vector<double> > data_file::readFile(){
 }
 
 std::vector<double> data_file::processLine(std::string line){
+//    printf("%s\n",line.c_str());
     size_t pos=0;
     std::vector<double> dataVect;
     while( (pos= line.find(delimiter_)) != std::string::npos){
         std::string parseStr= line.substr(0,pos);
+//        printf("%s |",parseStr.c_str());
         double parseVal= std::stod(parseStr);
         dataVect.push_back(parseVal);
-        line.erase(0,pos+1);
+//        printf("%s\n",line.c_str());
+
+        line= line.substr(line.find(delimiter_)+1);
+//        printf("%s\n",line.c_str());
     }
     double parseVal= std::stod(line);
     dataVect.push_back(parseVal);
+
+//    for (unsigned int i=0;i<dataVect.size();i++)
+//        printf("%.3f, ",dataVect.at(i));
+//    printf("\n");
 
     return dataVect;
 }

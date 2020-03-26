@@ -19,6 +19,7 @@ class data_file{
 private:
     std::fstream file_;
     std::string path_;
+    bool fwrite_;
     bool fopen_;
     float openNum_;
 
