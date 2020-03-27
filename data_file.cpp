@@ -35,9 +35,6 @@ std::string data_file::processPath(std::string path){
     if (path_.find("/")==path_.npos)
         path_= getenv("PWD")+std::string("/")+path_;
 
-    if (!fwrite_)
-        return path_;
-
     size_t pos= path_.find("%");
     if (pos==path_.npos){
         fileNum_= data_file::getFileNum(path_);
@@ -119,9 +116,11 @@ bool data_file::openFile(std::string path){
     if (fopen_)
         data_file::closeFile();
 
+    fwrite_=true;
     delimiter_= ',';
     path_= data_file::processPath(path);
-    data_file::processDirectory(path_);
+    if (fwrite_)
+        data_file::processDirectory(path_);
 
     if(!file_.is_open()){
        file_.open(path_.c_str(), std::ios::out|std::ios::trunc);
@@ -255,8 +254,8 @@ void data_file::recordTarget(std::vector<double> &data){
 }
 
 void data_file::record(){
-    std::lock_guard<std::mutex> lockWrite(mtxWrite_);
     if ( int(2*openNum_)%2==1 && !headerBuf_.str().empty()){
+        std::lock_guard<std::mutex> lockWrite(mtxWrite_);
         file_ << headerBuf_.str();
         openNum_+=float(0.5);
     }

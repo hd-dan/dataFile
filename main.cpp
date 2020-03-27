@@ -8,8 +8,9 @@
 void testDataFile(){
 
     std::string path("~/Desktop/test%/testData%.csv");
-    data_file datafile(path,true);
+    data_file datafile;
 
+    datafile.openFile(path);
 //    std::string path("~/Desktop/testData.csv");
 //    data_file datafile(path);
 
@@ -106,12 +107,12 @@ void testXml(){
 int main(){
     std::cout << "Hello World!" << std::endl;
 
-//    testDataFile();
+    testDataFile();
 //    testParse();
 //    readFile();
 
 //    testDf();
-    testXml();
+//    testXml();
 
     return 0;
 }
