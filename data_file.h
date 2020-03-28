@@ -25,7 +25,7 @@ private:
 
     std::string processPath(std::string path);
     void processDirectory(std::string dir);
-    int getFileNum(std::string path);
+    int retrieveFileNum(std::string path);
     int extractIntFromStr(std::string numStr);
     int fileNum_;
 
@@ -48,6 +48,8 @@ public:
     ~data_file();
     bool openFile();
     bool openFile(std::string path);
+    std::string getPath();
+    int getFileNum();
 
     bool header(std::string name);
     template <class num>

@@ -17,42 +17,48 @@ data_file::~data_file(){
 }
 
 std::string data_file::processPath(std::string path){
-    path_= path;
-    if (path_.at(0)=='~')
-        path_= getenv("HOME")+path_.substr(1);
-    if (path_.find("..")==0){
+    if (path.at(0)=='~')
+        path= getenv("HOME")+path.substr(1);
+    if (path.find("..")==0){
 //        std::string pwd= getenv("PWD");
         char tuh[PATH_MAX];
         std::string pwd=getcwd(tuh,sizeof(tuh));
         do{
             pwd= pwd.substr(0,pwd.rfind("/"));
-            path_= path_.substr(path_.find("..")+2);
-        }while(path_.find("..")<2);
-        path_= pwd+path_;
+            path= path.substr(path.find("..")+2);
+        }while(path.find("..")<2);
+        path= pwd+path;
 
-    }else if(path_.at(0)=='.')
-        path_= getenv("PWD")+path_.substr(1);
-    if (path_.find("/")==path_.npos)
-        path_= getenv("PWD")+std::string("/")+path_;
-
-    size_t pos= path_.find("%");
-    if (pos==path_.npos){
-        fileNum_= data_file::getFileNum(path_);
-        size_t dotpos= path_.find(".");
-        if (dotpos==std::string::npos)
-            dotpos= path_.size();
-        path_.insert(dotpos,std::to_string(fileNum_));
-    }else{
-        fileNum_= data_file::getFileNum(path_.substr(0,pos));
-        do {
-            path_.erase(pos,1);
-            path_.insert(pos,std::to_string(fileNum_));
-        }while( (pos=path_.find("%"))!=std::string::npos);
+    }else if(path.at(0)=='.'){
+        char tuh[PATH_MAX];
+        std::string pwd=getcwd(tuh,sizeof(tuh));
+        path= pwd+path.substr(1);
     }
+    if (path.find("/")==path.npos){
+        char tuh[PATH_MAX];
+        std::string pwd=getcwd(tuh,sizeof(tuh));
+        path= pwd+std::string("/")+path;
+    }
+
+    size_t pos= path.find("%");
+    if (pos==path.npos){
+        fileNum_= data_file::retrieveFileNum(path);
+        size_t dotpos= path.find(".");
+        if (dotpos==std::string::npos)
+            dotpos= path.size();
+        path.insert(dotpos,std::to_string(fileNum_));
+    }else{
+        fileNum_= data_file::retrieveFileNum(path.substr(0,pos));
+        do {
+            path.erase(pos,1);
+            path.insert(pos,std::to_string(fileNum_));
+        }while( (pos=path.find("%"))!=std::string::npos);
+    }
+    path_= path;
     return path_;
 }
 
-int data_file::getFileNum(std::string path){
+int data_file::retrieveFileNum(std::string path){
     std::string pathdir;
     std::string name;
     size_t dirpos= path.rfind("/");
@@ -133,6 +139,12 @@ bool data_file::openFile(std::string path){
     return fopen_;
 }
 
+std::string data_file::getPath(){
+    return path_;
+}
+int data_file::getFileNum(){
+    return fileNum_;
+}
 
 bool data_file::closeFile(){
     if (fopen_){
