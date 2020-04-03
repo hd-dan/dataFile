@@ -283,7 +283,14 @@ void data_file::record(){
             std::vector<double> data=
                     *boost::any_cast<std::vector<double> *>(recordBuffer_.at(i));
             data_file::write(data);
-
+        }
+        else if (recordBuffer_.at(i).type()==typeid(int *)){
+            int data= *boost::any_cast<int *>(recordBuffer_.at(i));
+            data_file::write(data);
+        }
+        else if (recordBuffer_.at(i).type()==typeid(bool *)){
+            bool data= *boost::any_cast<bool *>(recordBuffer_.at(i));
+            data_file::write(data);
         }
     }
 }
