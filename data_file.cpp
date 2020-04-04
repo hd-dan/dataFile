@@ -40,6 +40,11 @@ std::string data_file::processPath(std::string path){
         path= pwd+std::string("/")+path;
     }
 
+    if (!fwrite_){
+        path_= path;
+        return path;
+    }
+
     size_t pos= path.find("%");
     if (pos==path.npos){
         fileNum_= data_file::retrieveFileNum(path);
@@ -304,6 +309,9 @@ std::vector<std::vector<double> > data_file::readFile(){
 
     std::string line;
     std::getline(file_,line);
+
+    if (!line.empty() && line.at(0)=='#')
+        std::getline(file_,line);
     data_file::processHeaders(line);
 
     while( std::getline(file_,line) ){
@@ -369,4 +377,19 @@ std::vector<std::vector<double> > data_file::getContent(){
 
 std::vector<std::string> data_file::getHeader(){
     return contentHeader_;
+}
+
+int data_file::findHeaderIndex(std::string headeri){
+    for (unsigned i=0;i<contentHeader_.size();i++){
+        if (!contentHeader_.at(i).compare(headeri))
+            return i;
+    }
+    return -1;
+}
+
+std::vector<double> data_file::getContent(std::string header){
+    int ind= data_file::findHeaderIndex(header);
+    if (ind!= -1)
+        return contentBuf_.at(ind);
+    return std::vector<double>(0,0);
 }

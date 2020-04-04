@@ -77,6 +77,9 @@ public:
     std::vector<std::vector<double> > readFile();
     std::vector<std::vector<double> > getContent();
     std::vector<std::string> getHeader();
+
+    int findHeaderIndex(std::string headeri);
+    std::vector<double> getContent(std::string header);
 };
 
 #endif // DATA_FILE_H
