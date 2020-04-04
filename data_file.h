@@ -74,9 +74,11 @@ public:
     void recordTarget(std::vector<double> &data);
     void record();
 
+    std::vector<std::vector<double> > readFile(std::string path);
     std::vector<std::vector<double> > readFile();
     std::vector<std::vector<double> > getContent();
     std::vector<std::string> getHeader();
+    void clearContent();
 
     int findHeaderIndex(std::string headeri);
     std::vector<double> getContent(std::string header);

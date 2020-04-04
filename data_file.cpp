@@ -300,6 +300,10 @@ void data_file::record(){
     }
 }
 
+std::vector<std::vector<double> > data_file::readFile(std::string path){
+    path_= path;
+    return data_file::readFile();
+}
 std::vector<std::vector<double> > data_file::readFile(){
     fwrite_=false;
     path_= data_file::processPath(path_);
@@ -379,6 +383,11 @@ std::vector<std::vector<double> > data_file::getContent(){
 
 std::vector<std::string> data_file::getHeader(){
     return contentHeader_;
+}
+
+void data_file::clearContent(){
+    contentBuf_.clear();
+    return;
 }
 
 int data_file::findHeaderIndex(std::string headeri){
