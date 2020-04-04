@@ -308,14 +308,15 @@ std::vector<std::vector<double> > data_file::readFile(){
     file_.seekg(0,file_.beg);
 
     std::string line;
-    std::getline(file_,line);
-
-    if (!line.empty() && line.at(0)=='#')
+    do {
         std::getline(file_,line);
+    }while(!line.empty()&&line.at(0)=='#');
     data_file::processHeaders(line);
 
     while( std::getline(file_,line) ){
         if (line.empty())
+            continue;
+        if (line.at(0)=='#')
             continue;
         std::vector<double> lineVect= data_file::processLine(line);
         if (contentBuf_.size()==0){
@@ -326,6 +327,7 @@ std::vector<std::vector<double> > data_file::readFile(){
             contentBuf_.at(i).push_back(lineVect.at(i));
         }
     }
+
 
     return contentBuf_;
 }
