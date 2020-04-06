@@ -311,6 +311,8 @@ std::vector<std::vector<double> > data_file::readFile(){
     file_.open(path_,std::ios::in);
     file_.seekg(0,file_.beg);
 
+    data_file::clearContent();
+
     std::string line;
     do {
         std::getline(file_,line);
@@ -387,6 +389,7 @@ std::vector<std::string> data_file::getHeader(){
 
 void data_file::clearContent(){
     contentBuf_.clear();
+    headerBuf_.clear();
     return;
 }
 
@@ -403,4 +406,20 @@ std::vector<double> data_file::getContent(std::string header){
     if (ind!= -1)
         return contentBuf_.at(ind);
     return std::vector<double>(0,0);
+}
+
+std::vector<std::vector<double> > data_file::getContent(std::string header, int n){
+    std::vector<std::vector<double> > A;
+    for (unsigned int i=0;i<n;i++){
+        std::string headeri= header+"["+std::to_string(i)+"]";
+        std::vector<double> ai= data_file::getContent(headeri);
+        if (ai.size()>0)
+            A.push_back(ai);
+    }
+    std::vector<std::vector<double> > AT(A.at(0).size(),std::vector<double>(A.size(),0));
+    for (unsigned int i=0;i<A.size();i++){
+        for (unsigned int j=0;j<A.at(i).size();j++)
+            AT.at(j).at(i)= A.at(i).at(j);
+    }
+    return AT;
 }

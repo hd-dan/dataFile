@@ -82,6 +82,7 @@ public:
 
     int findHeaderIndex(std::string headeri);
     std::vector<double> getContent(std::string header);
+    std::vector<std::vector<double> > getContent(std::string header,int n);
 };
 
 #endif // DATA_FILE_H
